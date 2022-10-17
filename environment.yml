@@ -1,0 +1,12 @@
+name: pyspreads
+channels:
+  - conda-forge
+dependencies:
+  - python >= 3.10
+  - jupyterlab >= 3
+  - ipython
+  - ipywidgets
+  - matplotlib
+  - numpy
+  - scipy
+  - traitlets
