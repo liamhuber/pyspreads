@@ -13,7 +13,7 @@ palette = sns.color_palette('vlag', n_colors=5)
 
 
 class SingleAssetSingleExpiry(HasAsset):
-    options_matrix = Instance(
+    market = Instance(
         klass=np.ndarray,
         default_value=fake_data(),
         help="With columns strike price, call bid, call ask, put bid, put ask."
@@ -30,23 +30,23 @@ class SingleAssetSingleExpiry(HasAsset):
 
     @property
     def asset_prices(self):
-        return self.options_matrix[0]
+        return self.market[0]
 
     @property
     def call_bid(self):
-        return self.options_matrix[1]
+        return self.market[1]
 
     @property
     def call_ask(self):
-        return self.options_matrix[2]
+        return self.market[2]
 
     @property
     def put_bid(self):
-        return self.options_matrix[3]
+        return self.market[3]
 
     @property
     def put_ask(self):
-        return self.options_matrix[4]
+        return self.market[4]
 
     @property
     def smooth_call_bid(self):
@@ -83,8 +83,8 @@ class SingleAssetSingleExpiry(HasAsset):
     @property
     def premium_curve(self):
         return np.append(
-            self.options_matrix[4][self.asset_prices < self.asset],
-            self.options_matrix[2][self.asset_prices >= self.asset]
+            self.market[4][self.asset_prices < self.asset],
+            self.market[2][self.asset_prices >= self.asset]
         )
 
     def plot_premium(self, figax: Optional[tuple] = None):

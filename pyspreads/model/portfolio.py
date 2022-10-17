@@ -25,12 +25,12 @@ class SingleAssetSingleExpiry(HasAsset):
         return np.sum([p.value(asset_prices) for p in self.positions.values()], axis=0)
 
     @staticmethod
-    def _position_name(strike: float, long_or_short: str, call_or_put: str):
-        return f"{long_or_short}_{call_or_put}_{strike}"
+    def position_name(strike: float, long_or_short: str, call_or_put: str):
+        return f"{long_or_short}_{call_or_put}_{strike:.4f}".replace('.', '_')
 
     def take_position(self, price: float, strike: float, long_or_short: str, call_or_put: str):
         # TODO: Maybe make a tuple of option and count instead, so multiple can be taken
-        self.positions[self._position_name(strike, long_or_short, call_or_put)] = Option(
+        self.positions[self.position_name(strike, long_or_short, call_or_put)] = Option(
             price=price,
             strike=strike,
             asset=self.asset,
@@ -39,7 +39,7 @@ class SingleAssetSingleExpiry(HasAsset):
         )
 
     def remove_position(self, strike: float, long_or_short: str, call_or_put: str):
-        self.positions.pop(self._position_name(strike, long_or_short, call_or_put))
+        self.positions.pop(self.position_name(strike, long_or_short, call_or_put))
 
     def buy_call(self, price: float, strike: float):
         self.take_position(price, strike, 'long', 'call')

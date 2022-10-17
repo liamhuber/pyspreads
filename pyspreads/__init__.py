@@ -1,0 +1,1 @@
+from pyspreads.gui.gui import VerticalGUI

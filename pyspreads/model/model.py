@@ -4,11 +4,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
 
-from pyspreads.model.environment import SingleAssetSingleExpiry as SASEEnvironment
+from pyspreads.model.market import SingleAssetSingleExpiry as SASEMarket
 from pyspreads.model.portfolio import SingleAssetSingleExpiry as SASEPortfolio
 
 
-class VerticalModel(SASEEnvironment, SASEPortfolio):
+class VerticalModel(SASEMarket, SASEPortfolio):
     def plot_value(self, figax: Optional[tuple] = None, show_legend=True):
         fig, ax = plt.subplots() if figax is None else figax
         super().plot_value(self.asset_prices, figax=(fig, ax))
