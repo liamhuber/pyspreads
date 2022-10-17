@@ -25,4 +25,9 @@ class VerticalModel(SASEMarket, SASEPortfolio):
 
     @property
     def max_drawdown(self):
+        # TODO: Check derivatives at maxima to allow for an "unbounded" response
         return np.amin(self.value(self.asset_prices))
+
+    @property
+    def max_return(self):
+        raise NotImplementedError
