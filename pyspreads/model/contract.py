@@ -75,7 +75,7 @@ class Option(HasTraits):
         elif self._is_long and self._is_call:
             return (asset_prices - self.strike).clip(min=0) - self.price
         elif self._is_short and self._is_put:
-            self.price - (self.strike - asset_prices).clip(min=0)
+            return self.price - (self.strike - asset_prices).clip(min=0)
         elif self._is_long and self._is_put:
             return (self.strike - asset_prices).clip(min=0) - self.price
         else:
