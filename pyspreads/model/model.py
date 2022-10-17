@@ -11,7 +11,8 @@ from pyspreads.model.portfolio import SingleAssetSingleExpiry as SASEPortfolio
 class VerticalModel(SASEMarket, SASEPortfolio):
     def plot_value(self, figax: Optional[tuple] = None, show_legend=True):
         fig, ax = plt.subplots() if figax is None else figax
-        super().plot_value(self.asset_prices, figax=(fig, ax))
+        if len(self.positions) > 0:
+            super().plot_value(self.asset_prices, figax=(fig, ax))
         ax2 = ax.twinx()
         self.plot_expectation(figax=(fig, ax2))
         if show_legend:
@@ -30,4 +31,4 @@ class VerticalModel(SASEMarket, SASEPortfolio):
 
     @property
     def max_return(self):
-        raise NotImplementedError
+        return "Not implemented"

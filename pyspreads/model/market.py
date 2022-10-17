@@ -104,7 +104,7 @@ class SingleAssetSingleExpiry(HasAsset):
         ax.set_ylabel("P(X)")
         return fig, ax
 
-    def plot_environment(self, figax: Optional[tuple] = None, show_legend=True):
+    def plot_market(self, figax: Optional[tuple] = None, show_legend=True):
         fig, ax = plt.subplots() if figax is None else figax
         self.plot_matrix(figax=(fig, ax))
         ax2 = ax.twinx()
