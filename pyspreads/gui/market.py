@@ -14,7 +14,7 @@ class SingleAssetSingleExpiry(SubWidget):
     def __init__(self, gui: VerticalGUI):
         super().__init__(gui=gui)
         self.button_layout = widgets.Layout(width='50px', justify_content='center')
-        self.row_layout = widgets.Layout(min_height='35px', min_width='500px')
+        self.row_layout = widgets.Layout(min_height='35px')
 
     @staticmethod
     def price_to_string(price):
@@ -63,7 +63,7 @@ class SingleAssetSingleExpiry(SubWidget):
                 layout=self.row_layout
             ))
 
-        panel_layout = widgets.Layout(height='500px')
+        panel_layout = widgets.Layout(height='400px', min_width='400px')
         panel = widgets.VBox(rows, layout=panel_layout)
 
         self._widget = widgets.VBox([header, panel])

@@ -21,18 +21,34 @@ class VerticalGUI(VerticalModel):
         with self.portfolio_display:
             display(self.plot_value()[0])
 
-        return widgets.HBox(
+        portfolio_summary = widgets.VBox(
+            [
+                widgets.Label(f"MAX RETURN = {self.max_return}"),
+                widgets.Label(f"EXPECTATION = {self.expectation}"),
+                widgets.Label(f"MAX DRAWDOWN = {self.max_drawdown}"),
+            ]
+        )
+
+        main = widgets.HBox(
             [
                 self.market_gui.widget,
                 self.portfolio_display,
                 widgets.VBox(
-                    [
-                        self.market_display,
-                        widgets.Label(f"MAX RETURN = {self.max_return}"),
-                        widgets.Label(f"EXPECTATION = {self.expectation}"),
-                        widgets.Label(f"MAX DRAWDOWN = {self.max_drawdown}"),
-                    ],
-                    layout=widgets.Layout(width='25%')
+                    [self.market_display, portfolio_summary],
+                    layout=widgets.Layout(width='33%')
                 )
             ]
         )
+        tabs = widgets.Tab(
+            [
+                main,
+                self.market_display,
+                widgets.HBox([self.portfolio_display, portfolio_summary])
+            ],
+            layout=widgets.Layout(height='500px')
+        )
+        tabs.set_title(0, 'Trade')
+        tabs.set_title(1, 'Market')
+        tabs.set_title(2, 'Portfolio')
+
+        return tabs
