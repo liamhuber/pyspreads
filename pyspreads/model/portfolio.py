@@ -59,3 +59,6 @@ class SingleAssetSingleExpiry(HasAsset):
         ax.set_ylabel("Value")
         ax.axhline(0, color='k', linestyle='--')
         return fig, ax
+
+    def clear_portfolio(self):
+        self.positions = {}

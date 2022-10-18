@@ -15,6 +15,7 @@ class SingleAssetSingleExpiry(SubWidget):
         super().__init__(gui=gui)
         self.button_layout = widgets.Layout(width='50px', justify_content='center')
         self.row_layout = widgets.Layout(min_height='35px')
+        self.buttons = []
 
     @staticmethod
     def price_to_string(price):
@@ -42,7 +43,12 @@ class SingleAssetSingleExpiry(SubWidget):
         if change['new']:  # Pressed
             self.gui.take_position(button.price, button.strike, button.long_or_short, button.call_or_put)
         else:  # Unpressed
-            self.gui.remove_position(button.strike, button.long_or_short, button.call_or_put)
+            try:
+                self.gui.remove_position(button.strike, button.long_or_short, button.call_or_put)
+            except KeyError:
+                pass
+                # TODO: This is an ugly hack to do with unpressing a button after the portfolio has been cleared.
+                #       Find a  nicer way to deal with it.
 
     def draw(self):
         header = widgets.HBox(
@@ -68,3 +74,12 @@ class SingleAssetSingleExpiry(SubWidget):
 
         self._widget = widgets.VBox([header, panel])
         return self._widget
+
+    def unpress_all(self):
+        """
+        TODO: Be more elegant and store the pressed ones somewhere to avoid the loop
+        """
+        for hbox in self.widget.children[1].children:
+            for button in hbox.children:
+                if isinstance(button, widgets.ToggleButton) and button.value:
+                    button.value = False

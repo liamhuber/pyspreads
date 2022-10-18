@@ -11,11 +11,14 @@ class VerticalGUI(VerticalModel):
         self.market_gui = SASEMarketGUI(self)
         self.market_display = widgets.Output()
         self.portfolio_display = widgets.Output()
+        clear_portfolio_button = widgets.Button(description="Clear portfolio")
+        clear_portfolio_button.on_click(self.on_click_clear_portfolio)
         self.portfolio_summary = widgets.VBox(
             [
                 widgets.Label(f"MAX RETURN = {self.max_return}"),
                 widgets.Label(f"EXPECTATION = {self.expectation}"),
                 widgets.Label(f"MAX DRAWDOWN = {self.max_drawdown}"),
+                clear_portfolio_button
             ]
         )
         self.trade_screen = widgets.HBox(
@@ -84,3 +87,16 @@ class VerticalGUI(VerticalModel):
     def remove_position(self, strike: float, long_or_short: str, call_or_put: str):
         super().remove_position(strike=strike, long_or_short=long_or_short, call_or_put=call_or_put)
         self.update_portfolio()
+
+    def clear_portfolio(self):
+        super().clear_portfolio()
+        self.update_portfolio()
+        # self.market_gui.unpress_all()
+        for hbox in self.tabs.children[0].children[0].children[1].children:
+            for tb in hbox.children:
+                if isinstance(tb, widgets.ToggleButton) and tb.value == True:
+                    tb.value = False
+        # TODO: Figure out why the buttons list in the market_gui is not the same as these children
+
+    def on_click_clear_portfolio(self, change):
+        self.clear_portfolio()
