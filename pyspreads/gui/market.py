@@ -36,6 +36,8 @@ class SingleAssetSingleExpiry(SubWidget):
         if self.gui.position_name(strike, long_or_short, call_or_put) in self.gui.positions.keys():
             button.value = True
         button.observe(self._on_option_button_toggle, names=['value'])
+        if (strike < self.gui.asset and call_or_put == 'call') or (self.gui.asset < strike and call_or_put == 'put'):
+            button.style.text_color = 'darkgreen'
         return button
 
     def _on_option_button_toggle(self, change):
