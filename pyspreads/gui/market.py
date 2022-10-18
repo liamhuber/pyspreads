@@ -69,7 +69,7 @@ class SingleAssetSingleExpiry(SubWidget):
                 layout=self.row_layout
             ))
 
-        panel_layout = widgets.Layout(height='400px', min_width='400px')
+        panel_layout = widgets.Layout(height='450px', min_width='400px')
         panel = widgets.VBox(rows, layout=panel_layout)
 
         self._widget = widgets.VBox([header, panel])

@@ -38,7 +38,7 @@ class VerticalGUI(VerticalModel):
                 self.market_display,
                 widgets.HBox([self.portfolio_display, self.portfolio_summary])
             ],
-            layout=widgets.Layout(height='500px')
+            layout=widgets.Layout(height='550px')
         )
         self.tabs.set_title(0, 'Trade')
         self.tabs.set_title(1, 'Market')
