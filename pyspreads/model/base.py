@@ -6,7 +6,7 @@ from traitlets import (
     MetaHasTraits
 )
 
-from pyspreads.data.fake import PRICE
+from pyspreads.data.placeholder import REAL_PRICE
 
 
 class TraitsABCMeta(MetaHasTraits, ABCMeta):
@@ -17,4 +17,4 @@ class HasAsset(HasTraits, ABC, metaclass=TraitsABCMeta):
     """
     A parent class for classes that rely on an underlying asset
     """
-    asset = Float(default_value=PRICE, help="The current price of the underlying asset.")
+    asset = Float(default_value=REAL_PRICE, help="The current price of the underlying asset.")

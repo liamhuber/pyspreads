@@ -4,29 +4,36 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 from scipy.signal import savgol_filter
-from traitlets import Dict, Instance, Int
+from traitlets import default, Dict, Instance, Int
 
 from pyspreads.model.base import HasAsset
-from pyspreads.data.fake import fake_data
-
-palette = sns.color_palette('vlag', n_colors=5)
+from pyspreads.data.parser import read
+from pyspreads.data.placeholder import REAL_PATH
 
 
 class SingleAssetSingleExpiry(HasAsset):
     market = Instance(
         klass=np.ndarray,
-        default_value=fake_data(),
         help="With columns strike price, call bid, call ask, put bid, put ask."
     )
     smoothing_window = Int(default_value=7, help="Window size for Savitzky-Golay smoothing")
     smoothing_order = Int(default_value=3, help="Polynomial order for Savitzky-Golay smoothing")
-    colors = Dict(default_value={
-        'call bid': palette[0],
-        'call ask': palette[1],
-        'put bid': palette[4],
-        'put ask': palette[3],
-        'expectation': 'black'
-    })
+    colors = Dict()
+
+    @default('market')
+    def _read_placeholder_data(self):
+        return read(REAL_PATH)
+
+    @default('colors')
+    def _palette(self):
+        palette = sns.color_palette('vlag', n_colors=5)
+        return {
+            'call bid': palette[0],
+            'call ask': palette[1],
+            'put bid': palette[4],
+            'put ask': palette[3],
+            'expectation': 'black'
+        }
 
     @property
     def asset_prices(self):
