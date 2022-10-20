@@ -18,7 +18,12 @@ def read(
     """
     Wraps numpy.loadtxt to read market data (strike, call bid, call ask, put bid, put ask) from a multi-line string or file.
     """
-    if isinstance(fname, Path) or Path(fname).is_file():
+    try:
+        isfile = isinstance(fname, Path) or Path(fname).is_file()
+    except OSError:  # When string is too long for Path init
+        isfile = False
+
+    if isfile:
         s = Path(fname).read_text()
     elif isinstance(fname, str):
         s = fname

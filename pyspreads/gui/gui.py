@@ -1,6 +1,7 @@
 import ipywidgets as widgets
 from IPython.display import display
 
+from pyspreads.gui.data import Loader
 from pyspreads.gui.market import SingleAssetSingleExpiry as SASEMarketGUI
 from pyspreads.model import VerticalModel
 
@@ -31,18 +32,21 @@ class VerticalGUI(VerticalModel):
                 )
             ]
         )
+        self.loader = Loader(self)
 
         self.tabs = widgets.Tab(
             [
                 self.trade_screen,
                 self.market_display,
-                widgets.HBox([self.portfolio_display, self.portfolio_summary])
+                widgets.HBox([self.portfolio_display, self.portfolio_summary]),
+                self.loader.widget
             ],
             layout=widgets.Layout(height='550px')
         )
         self.tabs.set_title(0, 'Trade')
         self.tabs.set_title(1, 'Market')
         self.tabs.set_title(2, 'Portfolio')
+        self.tabs.set_title(3, 'Load data')
 
     def draw_market_plot(self):
         self.market_display.clear_output()

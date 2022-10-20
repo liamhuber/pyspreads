@@ -9,7 +9,7 @@ class SubWidget(ABC):
     @property
     def widget(self):
         if self._widget is None:
-            self.draw()
+            self._widget = self.draw()
         return self._widget
 
     @abstractmethod
