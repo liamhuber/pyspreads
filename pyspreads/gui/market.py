@@ -74,7 +74,7 @@ class SingleAssetSingleExpiry(SubWidget):
         # panel_layout =
         panel = widgets.VBox(rows) #, layout=panel_layout)
 
-        return widgets.VBox([header, panel], layout=widgets.Layout(height='450px', min_width='310px'))
+        return widgets.VBox([header, panel], layout=widgets.Layout(height='450px', min_width='320px'))
 
     def unpress_all(self):
         """

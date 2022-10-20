@@ -56,7 +56,8 @@ class SingleAssetSingleExpiry(HasAsset):
     def plot_value(self, asset_prices, figax: Optional[tuple] = None):
         fig, ax = plt.subplots() if figax is None else figax
         ax.plot(asset_prices, self.value(asset_prices))
-        ax.set_ylabel("Value")
+        ax.set_ylabel("value [$]")
+        ax.set_xlabel("asset [$]")
         ax.axhline(0, color='k', linestyle='--')
         return fig, ax
 

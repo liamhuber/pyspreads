@@ -9,7 +9,7 @@ from pyspreads.model import VerticalModel
 class VerticalGUI(VerticalModel):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.asset_print = widgets.Label(f"ASSET PRICE = {self.asset}")
+        self.asset_print = widgets.Label(f"Asset price = {self.asset}")
         self.market_gui = SASEMarketGUI(self)
         self.market_display = widgets.Output()
         self.deviations_display = widgets.Output()
@@ -18,9 +18,10 @@ class VerticalGUI(VerticalModel):
         clear_portfolio_button.on_click(self.on_click_clear_portfolio)
         self.portfolio_summary = widgets.VBox(
             [
-                widgets.Label(f"MAX RETURN = {self.max_return}"),
-                widgets.Label(f"EXPECTATION = {self.expectation}"),
-                widgets.Label(f"MAX DRAWDOWN = {self.max_drawdown}"),
+                widgets.Label("Per-contract values:"),
+                widgets.Label(f"Max return = ${self.max_return:.3f}"),
+                widgets.Label(f"'Expected' return = ${self.expectation:.3f}"),
+                widgets.Label(f"Max drawdown = ${self.max_drawdown:.3f}"),
                 clear_portfolio_button
             ]
         )
@@ -79,9 +80,9 @@ class VerticalGUI(VerticalModel):
             display(self.plot_value()[0])
 
     def update_portfolio_summary(self):
-        self.portfolio_summary.children[0].value = f"MAX RETURN = {self.max_return}"
-        self.portfolio_summary.children[1].value = f"EXPECTATION = {self.expectation}"
-        self.portfolio_summary.children[2].value = f"MAX DRAWDOWN = {self.max_drawdown}"
+        self.portfolio_summary.children[1].value = f"Max return = {self.max_return:.3f}"
+        self.portfolio_summary.children[2].value = f"'Expected' return = {self.expectation:.3f}"
+        self.portfolio_summary.children[3].value = f"Max drawdown = {self.max_drawdown:.3f}"
 
     def update_market_gui(self):
         """Careful, this one is expensive"""

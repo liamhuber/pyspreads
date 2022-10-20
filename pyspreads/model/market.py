@@ -85,6 +85,8 @@ class SingleAssetSingleExpiry(HasAsset):
         ):
             ax.scatter(self.asset_prices, raw, color=self.colors[label])
             ax.plot(self.asset_prices, smooth, label=label, color=self.colors[label])
+        ax.set_ylabel("contract [$]")
+        ax.set_xlabel("asset [$]")
         return fig, ax
 
     def plot_deviations(self, figax: Optional[tuple] = None, show_legend: bool = True):
@@ -97,6 +99,8 @@ class SingleAssetSingleExpiry(HasAsset):
             ax.scatter(self.asset_prices, (raw - smooth)/smooth, label=label, color=self.colors[label])
         ax.axhline(0, color='k')
         ax.axvline(self.asset, linestyle='--', color='k')
+        ax.set_ylabel("contract deviation [%]")
+        ax.set_xlabel("asset [$]")
         if show_legend:
             fig.legend()
         fig.tight_layout()
@@ -124,7 +128,8 @@ class SingleAssetSingleExpiry(HasAsset):
         fig, ax = plt.subplots() if figax is None else figax
         ax.plot(self.asset_prices, self.expectation_curve, label="expectation", color=self.colors['expectation'])
         ax.axvline(self.asset, linestyle='--', color=self.colors['expectation'])
-        ax.set_ylabel("P(X)")
+        ax.set_ylabel("<asset>")
+        ax.set_xlabel("asset [$]")
         return fig, ax
 
     def plot_market(self, figax: Optional[tuple] = None, show_legend=True):

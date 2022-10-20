@@ -22,13 +22,14 @@ class VerticalModel(SASEMarket, SASEPortfolio):
 
     @property
     def expectation(self):
-        return np.sum(self.value(self.asset_prices) * self.expectation_curve)
+        return float(np.sum(self.value(self.asset_prices) * self.expectation_curve))
 
     @property
     def max_drawdown(self):
         # TODO: Check derivatives at maxima to allow for an "unbounded" response
-        return np.amin(self.value(self.asset_prices))
+        return float(np.amin(self.value(self.asset_prices)))
 
     @property
     def max_return(self):
-        return "Not implemented"
+        # Todo
+        return 0.
