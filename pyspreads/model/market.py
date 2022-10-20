@@ -108,6 +108,7 @@ class SingleAssetSingleExpiry(HasAsset):
     def plot_expectation(self, figax: Optional[tuple] = None):
         fig, ax = plt.subplots() if figax is None else figax
         ax.plot(self.asset_prices, self.expectation_curve, label="expectation", color=self.colors['expectation'])
+        ax.axvline(self.asset, linestyle='--', color=self.colors['expectation'])
         ax.set_ylabel("P(X)")
         return fig, ax
 
