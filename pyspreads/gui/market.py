@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 class SingleAssetSingleExpiry(SubWidget):
     def __init__(self, gui: VerticalGUI):
         super().__init__(gui=gui)
-        self.button_layout = widgets.Layout(width='50px', justify_content='center')
+        self.button_layout = widgets.Layout(width='60px', justify_content='center')
         self.row_layout = widgets.Layout(min_height='35px')
         self.buttons = []
 
@@ -71,11 +71,10 @@ class SingleAssetSingleExpiry(SubWidget):
                 layout=self.row_layout
             ))
 
-        panel_layout = widgets.Layout(height='450px', min_width='400px')
-        panel = widgets.VBox(rows, layout=panel_layout)
+        # panel_layout =
+        panel = widgets.VBox(rows) #, layout=panel_layout)
 
-        self._widget = widgets.VBox([header, panel])
-        return self._widget
+        return widgets.VBox([header, panel], layout=widgets.Layout(height='450px', min_width='310px'))
 
     def unpress_all(self):
         """

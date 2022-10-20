@@ -11,6 +11,7 @@ class VerticalGUI(VerticalModel):
         super().__init__(*args, **kwargs)
         self.market_gui = SASEMarketGUI(self)
         self.market_display = widgets.Output()
+        self.deviations_display = widgets.Output()
         self.portfolio_display = widgets.Output()
         clear_portfolio_button = widgets.Button(description="Clear portfolio")
         clear_portfolio_button.on_click(self.on_click_clear_portfolio)
@@ -25,10 +26,17 @@ class VerticalGUI(VerticalModel):
         self.trade_screen = widgets.HBox(
             [
                 self.market_gui.widget,
-                self.portfolio_display,
                 widgets.VBox(
-                    [self.market_display, self.portfolio_summary],
-                    layout=widgets.Layout(width='33%')
+                    [
+                        self.portfolio_display,
+                        self.portfolio_summary
+                    ]
+                ),
+                widgets.VBox(
+                    [
+                        self.market_display,
+                        self.deviations_display
+                    ]
                 )
             ]
         )
@@ -37,7 +45,7 @@ class VerticalGUI(VerticalModel):
         self.tabs = widgets.Tab(
             [
                 self.trade_screen,
-                self.market_display,
+                widgets.HBox([self.market_display, self.deviations_display]),
                 widgets.HBox([self.portfolio_display, self.portfolio_summary]),
                 self.loader.widget
             ],
@@ -52,6 +60,11 @@ class VerticalGUI(VerticalModel):
         self.market_display.clear_output()
         with self.market_display:
             display(self.plot_market()[0])
+
+    def draw_deviations_plot(self):
+        self.deviations_display.clear_output()
+        with self.deviations_display:
+            display(self.plot_deviations()[0])
 
     def draw_portfolio_plot(self):
         self.portfolio_display.clear_output()
@@ -71,6 +84,7 @@ class VerticalGUI(VerticalModel):
     def update_market(self):
         self.update_market_gui()
         self.draw_market_plot()
+        self.draw_deviations_plot()
 
     def update_portfolio(self):
         self.draw_portfolio_plot()

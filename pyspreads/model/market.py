@@ -87,6 +87,21 @@ class SingleAssetSingleExpiry(HasAsset):
             ax.plot(self.asset_prices, smooth, label=label, color=self.colors[label])
         return fig, ax
 
+    def plot_deviations(self, figax: Optional[tuple] = None, show_legend: bool = True):
+        fig, ax = plt.subplots() if figax is None else figax
+        for label, raw, smooth in zip(
+                ['call bid', 'call ask', 'put bid', 'put ask'],
+                [self.call_bid, self.call_ask, self.put_bid, self.put_ask],
+                [self.smooth_call_bid, self.smooth_call_ask, self.smooth_put_bid, self.smooth_put_ask]
+        ):
+            ax.scatter(self.asset_prices, (raw - smooth)/smooth, label=label, color=self.colors[label])
+        ax.axhline(0, color='k')
+        ax.axvline(self.asset, linestyle='--', color='k')
+        if show_legend:
+            fig.legend()
+        fig.tight_layout()
+        return fig, ax
+
     @property
     def premium_curve(self):
         return np.append(
