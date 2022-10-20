@@ -31,5 +31,4 @@ class VerticalModel(SASEMarket, SASEPortfolio):
 
     @property
     def max_return(self):
-        # Todo
-        return 0.
+        return float(np.amax(self.value(self.asset_prices)))

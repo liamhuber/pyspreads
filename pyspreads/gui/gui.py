@@ -19,9 +19,9 @@ class VerticalGUI(VerticalModel):
         self.portfolio_summary = widgets.VBox(
             [
                 widgets.Label("Per-contract values:"),
-                widgets.Label(f"Max return = ${self.max_return:.3f}"),
-                widgets.Label(f"'Expected' return = ${self.expectation:.3f}"),
-                widgets.Label(f"Max drawdown = ${self.max_drawdown:.3f}"),
+                widgets.Label(f"Max return (if bounded) = NaN"),
+                widgets.Label(f"'Expected' return = NaN"),
+                widgets.Label(f"Max drawdown (if bounded) =NaN"),
                 clear_portfolio_button
             ]
         )
@@ -80,9 +80,9 @@ class VerticalGUI(VerticalModel):
             display(self.plot_value()[0])
 
     def update_portfolio_summary(self):
-        self.portfolio_summary.children[1].value = f"Max return = {self.max_return:.3f}"
+        self.portfolio_summary.children[1].value = f"Max return (if bounded) = {self.max_return:.3f}"
         self.portfolio_summary.children[2].value = f"'Expected' return = {self.expectation:.3f}"
-        self.portfolio_summary.children[3].value = f"Max drawdown = {self.max_drawdown:.3f}"
+        self.portfolio_summary.children[3].value = f"Max drawdown (if bounded) = {self.max_drawdown:.3f}"
 
     def update_market_gui(self):
         """Careful, this one is expensive"""
