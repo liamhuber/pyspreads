@@ -9,6 +9,7 @@ from pyspreads.model import VerticalModel
 class VerticalGUI(VerticalModel):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.asset_print = widgets.Label(f"ASSET PRICE = {self.asset}")
         self.market_gui = SASEMarketGUI(self)
         self.market_display = widgets.Output()
         self.deviations_display = widgets.Output()
@@ -35,7 +36,8 @@ class VerticalGUI(VerticalModel):
                 widgets.VBox(
                     [
                         self.market_display,
-                        self.deviations_display
+                        self.deviations_display,
+                        self.asset_print
                     ]
                 )
             ]
@@ -45,7 +47,12 @@ class VerticalGUI(VerticalModel):
         self.tabs = widgets.Tab(
             [
                 self.trade_screen,
-                widgets.HBox([self.market_display, self.deviations_display]),
+                widgets.VBox(
+                    [
+                        widgets.HBox([self.market_display, self.deviations_display]),
+                        self.asset_print
+                    ]
+                ),
                 widgets.HBox([self.portfolio_display, self.portfolio_summary]),
                 self.loader.widget
             ],
@@ -85,6 +92,7 @@ class VerticalGUI(VerticalModel):
         self.update_market_gui()
         self.draw_market_plot()
         self.draw_deviations_plot()
+        self.asset_print = widgets.Label(f"ASSET PRICE = {self.asset}")
 
     def update_portfolio(self):
         self.draw_portfolio_plot()
