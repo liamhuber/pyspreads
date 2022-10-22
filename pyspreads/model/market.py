@@ -11,7 +11,7 @@ from pyspreads.data.parser import read
 from pyspreads.data.placeholder import REAL_PATH
 
 
-class SingleAssetSingleExpiry(HasAsset):
+class HasMarket(HasAsset):
     market = Instance(
         klass=np.ndarray,
         help="With columns strike price, call bid, call ask, put bid, put ask."

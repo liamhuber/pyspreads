@@ -9,7 +9,7 @@ from pyspreads.model.base import HasAsset
 from pyspreads.model.contract import Option
 
 
-class SingleAssetSingleExpiry(HasAsset):
+class HasPositions(HasAsset):
     """
     A model for assembling a position consisting of multiple options with the same underlying asset and expiry date.
     """
@@ -53,7 +53,7 @@ class SingleAssetSingleExpiry(HasAsset):
     def sell_put(self, price: float, strike: float):
         self.take_position(price, strike, 'short', 'put')
 
-    def plot_value(self, asset_prices, figax: Optional[tuple] = None):
+    def plot_positions(self, asset_prices, figax: Optional[tuple] = None):
         fig, ax = plt.subplots() if figax is None else figax
         ax.plot(asset_prices, self.value(asset_prices))
         ax.set_ylabel("value [$]")
@@ -61,5 +61,5 @@ class SingleAssetSingleExpiry(HasAsset):
         ax.axhline(0, color='k', linestyle='--')
         return fig, ax
 
-    def clear_portfolio(self):
+    def clear_positions(self):
         self.positions = {}

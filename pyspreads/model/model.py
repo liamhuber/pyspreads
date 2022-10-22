@@ -4,15 +4,15 @@ import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
 
-from pyspreads.model.market import SingleAssetSingleExpiry as SASEMarket
-from pyspreads.model.portfolio import SingleAssetSingleExpiry as SASEPortfolio
+from pyspreads.model.market import HasMarket
+from pyspreads.model.portfolio import HasPositions
 
 
-class VerticalModel(SASEMarket, SASEPortfolio):
-    def plot_value(self, figax: Optional[tuple] = None, show_legend=True):
+class VerticalModel(HasMarket, HasPositions):
+    def plot_positions(self, figax: Optional[tuple] = None, show_legend=True):
         fig, ax = plt.subplots() if figax is None else figax
         if len(self.positions) > 0:
-            super().plot_value(self.asset_prices, figax=(fig, ax))
+            super().plot_positions(self.asset_prices, figax=(fig, ax))
         ax2 = ax.twinx()
         self.plot_expectation(figax=(fig, ax2))
         if show_legend:

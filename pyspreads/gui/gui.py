@@ -77,7 +77,7 @@ class VerticalGUI(VerticalModel):
     def draw_portfolio_plot(self):
         self.portfolio_display.clear_output()
         with self.portfolio_display:
-            display(self.plot_value()[0])
+            display(self.plot_positions()[0])
 
     def update_portfolio_summary(self):
         self.portfolio_summary.children[1].value = f"Max return (if bounded) = {self.max_return:.3f}"
@@ -115,8 +115,8 @@ class VerticalGUI(VerticalModel):
         super().remove_position(strike=strike, long_or_short=long_or_short, call_or_put=call_or_put)
         self.update_portfolio()
 
-    def clear_portfolio(self):
-        super().clear_portfolio()
+    def clear_positions(self):
+        super().clear_positions()
         self.update_portfolio()
         # self.market_gui.unpress_all()
         for hbox in self.tabs.children[0].children[0].children[1].children:
@@ -126,4 +126,4 @@ class VerticalGUI(VerticalModel):
         # TODO: Figure out why the buttons list in the market_gui is not the same as these children
 
     def on_click_clear_portfolio(self, change):
-        self.clear_portfolio()
+        self.clear_positions()
