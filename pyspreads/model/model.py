@@ -5,7 +5,7 @@ import numpy as np
 import seaborn as sns
 
 from pyspreads.model.market import HasMarket
-from pyspreads.model.portfolio import HasPositions
+from pyspreads.model.positions import HasPositions
 
 
 class VerticalModel(HasMarket, HasPositions):
