@@ -96,6 +96,27 @@ class HasMarket(HasAsset):
     def normalized_deviations(self):
         return (self.premiums - self.smoothed_premiums) / self.smoothed_premiums
 
+    @property
+    def out_of_the_money_premiums(self):
+        return np.append(
+            self.market[4][self.asset_prices < self.asset],
+            self.market[2][self.asset_prices >= self.asset]
+        )
+
+    @property
+    def expectation_curve(self):
+        eps = 1e-8
+        exp = np.exp(-1 / (self.out_of_the_money_premiums + eps))
+        return exp / np.trapz(exp, x=self.asset_prices)
+
+    def plot_expectation(self, figax: Optional[tuple] = None):
+        fig, ax = plt.subplots() if figax is None else figax
+        ax.plot(self.asset_prices, self.expectation_curve, label="expectation", color=self.colors['expectation'])
+        ax.axvline(self.asset, linestyle='--', color=self.colors['expectation'])
+        ax.set_ylabel("<asset>")
+        ax.set_xlabel("asset [$]")
+        return fig, ax
+
     def plot_matrix(self, figax: Optional[tuple] = None):
         fig, ax = plt.subplots() if figax is None else figax
         for label, raw, smooth in zip(
@@ -107,6 +128,11 @@ class HasMarket(HasAsset):
             ax.plot(self.asset_prices, smooth, label=label, color=self.colors[label])
         ax.set_ylabel("contract [$]")
         ax.set_xlabel("asset [$]")
+        return fig, ax
+
+    def plot_premium(self, figax: Optional[tuple] = None):
+        fig, ax = plt.subplots() if figax is None else figax
+        ax.plot(self.asset_prices, self.out_of_the_money_premiums)
         return fig, ax
 
     def plot_deviations(self, figax: Optional[tuple] = None, show_legend: bool = True):
@@ -123,32 +149,6 @@ class HasMarket(HasAsset):
         if show_legend:
             fig.legend()
         fig.tight_layout()
-        return fig, ax
-
-    @property
-    def premium_curve(self):
-        return np.append(
-            self.market[4][self.asset_prices < self.asset],
-            self.market[2][self.asset_prices >= self.asset]
-        )
-
-    def plot_premium(self, figax: Optional[tuple] = None):
-        fig, ax = plt.subplots() if figax is None else figax
-        ax.plot(self.asset_prices, self.premium_curve)
-        return fig, ax
-
-    @property
-    def expectation_curve(self):
-        eps = 1e-8
-        exp = np.exp(-1 / (self.premium_curve + eps))
-        return exp / np.trapz(exp, x=self.asset_prices)
-
-    def plot_expectation(self, figax: Optional[tuple] = None):
-        fig, ax = plt.subplots() if figax is None else figax
-        ax.plot(self.asset_prices, self.expectation_curve, label="expectation", color=self.colors['expectation'])
-        ax.axvline(self.asset, linestyle='--', color=self.colors['expectation'])
-        ax.set_ylabel("<asset>")
-        ax.set_xlabel("asset [$]")
         return fig, ax
 
     def plot_market(self, figax: Optional[tuple] = None, show_legend=True):
