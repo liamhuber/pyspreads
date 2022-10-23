@@ -55,33 +55,53 @@ class HasMarket(HasAsset):
     def put_ask(self):
         return self.market[4]
 
-    @property
-    def smooth_call_bid(self):
-        # TODO: Do it with a decorator or something
-        y = self.call_bid
-        return savgol_filter(y, self.smoothing_window, self.smoothing_order)
+    def smooth(self, x):
+        return savgol_filter(x, self.smoothing_window, self.smoothing_order)
+
+    def call_premium(self, x):
+        return np.append(
+            (x - self.asset + self.asset_prices)[self.asset_prices <= self.asset],
+            x[self.asset_prices > self.asset]
+        )
+
+    def put_premium(self, x):
+        return np.append(
+            x[self.asset_prices < self.asset],
+            (x + self.asset - self.asset_prices)[self.asset_prices >= self.asset]
+        )
 
     @property
-    def smooth_call_ask(self):
-        y = self.call_ask
-        return savgol_filter(y, self.smoothing_window, self.smoothing_order)
+    def smoothed(self):
+        return np.array([self.smooth(x) for x in self.market[1:]])
 
     @property
-    def smooth_put_bid(self):
-        y = self.put_bid
-        return savgol_filter(y, self.smoothing_window, self.smoothing_order)
+    def premiums(self):
+        return np.array([
+            self.call_premium(self.call_bid),
+            self.call_premium(self.call_ask),
+            self.put_premium(self.put_bid),
+            self.put_premium(self.put_ask)
+        ])
 
     @property
-    def smooth_put_ask(self):
-        y = self.put_ask
-        return savgol_filter(y, self.smoothing_window, self.smoothing_order)
+    def smoothed_premiums(self):
+        return np.array([
+            self.call_premium(self.smooth(self.call_bid)),
+            self.call_premium(self.smooth(self.call_ask)),
+            self.put_premium(self.smooth(self.put_bid)),
+            self.put_premium(self.smooth(self.put_ask))
+        ])
+
+    @property
+    def normalized_deviations(self):
+        return (self.premiums - self.smoothed_premiums) / self.smoothed_premiums
 
     def plot_matrix(self, figax: Optional[tuple] = None):
         fig, ax = plt.subplots() if figax is None else figax
         for label, raw, smooth in zip(
             ['call bid', 'call ask', 'put bid', 'put ask'],
-            [self.call_bid, self.call_ask, self.put_bid, self.put_ask],
-            [self.smooth_call_bid, self.smooth_call_ask, self.smooth_put_bid, self.smooth_put_ask]
+            self.market[1:],
+            self.smoothed
         ):
             ax.scatter(self.asset_prices, raw, color=self.colors[label])
             ax.plot(self.asset_prices, smooth, label=label, color=self.colors[label])
@@ -91,12 +111,11 @@ class HasMarket(HasAsset):
 
     def plot_deviations(self, figax: Optional[tuple] = None, show_legend: bool = True):
         fig, ax = plt.subplots() if figax is None else figax
-        for label, raw, smooth in zip(
+        for label, deviation in zip(
                 ['call bid', 'call ask', 'put bid', 'put ask'],
-                [self.call_bid, self.call_ask, self.put_bid, self.put_ask],
-                [self.smooth_call_bid, self.smooth_call_ask, self.smooth_put_bid, self.smooth_put_ask]
+                self.normalized_deviations * 100
         ):
-            ax.scatter(self.asset_prices, (raw - smooth)/smooth, label=label, color=self.colors[label])
+            ax.scatter(self.asset_prices, deviation, label=label, color=self.colors[label])
         ax.axhline(0, color='k')
         ax.axvline(self.asset, linestyle='--', color='k')
         ax.set_ylabel("contract deviation [%]")
