@@ -46,7 +46,8 @@ class Loader:
         )
 
         self.data = widgets.Textarea(
-            placeholder="Enter columnar market data here",
+            placeholder="Enter columnar market data here, and adjust column selectors/comment symbol/rows to skip as "
+                        "needed",
             layout=widgets.Layout(height='400px', width='100%')
         )
         self.screen = widgets.HBox([self.controls, self.data])
