@@ -1,6 +1,6 @@
 import ipywidgets as widgets
-from IPython.display import display
 
+from pyspreads.gui.about import About
 from pyspreads.gui.data import Loader
 from pyspreads.gui.market import MarketGUI
 from pyspreads.gui.positions import PositionsGUI
@@ -27,7 +27,8 @@ class VerticalGUI(MarketGUI, PositionsGUI):
                 self.trade_screen,
                 self.market_screen,
                 self.positions_screen,
-                self.loader.screen
+                self.loader.screen,
+                About().screen
             ],
             layout=widgets.Layout(height='550px')
         )
@@ -35,6 +36,7 @@ class VerticalGUI(MarketGUI, PositionsGUI):
         self.tabs.set_title(1, 'Market')
         self.tabs.set_title(2, 'Positions')
         self.tabs.set_title(3, 'Load data')
+        self.tabs.set_title(4, 'About')
 
     def _build_trade_widget(self):
         row_layout = widgets.Layout(min_height='35px')
