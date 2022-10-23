@@ -2,15 +2,15 @@ import ipywidgets as widgets
 from IPython.display import display
 
 from pyspreads.gui.data import Loader
-from pyspreads.gui.market import SingleAssetSingleExpiry as SASEMarketGUI
+from pyspreads.gui.market import MarketGUI
 from pyspreads.model import VerticalModel
 
 
-class VerticalGUI(VerticalModel):
+class VerticalGUI(VerticalModel, MarketGUI):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.asset_print = widgets.Label(f"Asset price = {self.asset}")
-        self.market_gui = SASEMarketGUI(self)
+        self.market_gui = MarketGUI()
         self.market_display = widgets.Output()
         self.deviations_display = widgets.Output()
         self.portfolio_display = widgets.Output()
@@ -86,7 +86,7 @@ class VerticalGUI(VerticalModel):
 
     def update_market_gui(self):
         """Careful, this one is expensive"""
-        self.market_gui = SASEMarketGUI(self)
+        self.market_gui = MarketGUI()
         self.market_gui.draw()
 
     def update_market(self):

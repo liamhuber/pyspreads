@@ -4,18 +4,21 @@ from typing import TYPE_CHECKING
 
 import ipywidgets as widgets
 
-from pyspreads.gui.base import SubWidget
+from pyspreads.model.market import HasMarket
 
 if TYPE_CHECKING:
     from pyspreads.gui.gui import VerticalGUI
 
 
-class SingleAssetSingleExpiry(SubWidget):
+class MarketGUI(HasMarket):
     def __init__(self, gui: VerticalGUI):
         super().__init__(gui=gui)
         self.button_layout = widgets.Layout(width='60px', justify_content='center')
         self.row_layout = widgets.Layout(min_height='35px')
         self.buttons = []
+
+        self.market_output = widgets.Output()
+        self.
 
     @staticmethod
     def price_to_string(price):

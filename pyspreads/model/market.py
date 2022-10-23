@@ -117,46 +117,62 @@ class HasMarket(HasAsset):
         ax.set_xlabel("asset [$]")
         return fig, ax
 
-    def plot_matrix(self, figax: Optional[tuple] = None):
+    def _plot_raw_and_smooth(
+            self,
+            raw_matrix,
+            ylabel,
+            smooth_matrix = None,
+            figax: Optional[tuple] = None,
+            show_legend: bool = True,
+            with_expectation: bool = True
+    ):
         fig, ax = plt.subplots() if figax is None else figax
         for label, raw, smooth in zip(
-            ['call bid', 'call ask', 'put bid', 'put ask'],
-            self.market[1:],
-            self.smoothed
+                ['call bid', 'call ask', 'put bid', 'put ask'],
+                raw_matrix,
+                smooth_matrix or raw_matrix
         ):
             ax.scatter(self.asset_prices, raw, color=self.colors[label])
-            ax.plot(self.asset_prices, smooth, label=label, color=self.colors[label])
-        ax.set_ylabel("contract [$]")
+            if smooth_matrix is not None:
+                ax.plot(self.asset_prices, smooth, label=label, color=self.colors[label])
+        ax.set_ylabel(ylabel)
         ax.set_xlabel("asset [$]")
-        return fig, ax
-
-    def plot_premium(self, figax: Optional[tuple] = None):
-        fig, ax = plt.subplots() if figax is None else figax
-        ax.plot(self.asset_prices, self.out_of_the_money_premiums)
-        return fig, ax
-
-    def plot_deviations(self, figax: Optional[tuple] = None, show_legend: bool = True):
-        fig, ax = plt.subplots() if figax is None else figax
-        for label, deviation in zip(
-                ['call bid', 'call ask', 'put bid', 'put ask'],
-                self.normalized_deviations * 100
-        ):
-            ax.scatter(self.asset_prices, deviation, label=label, color=self.colors[label])
-        ax.axhline(0, color='k')
         ax.axvline(self.asset, linestyle='--', color='k')
-        ax.set_ylabel("contract deviation [%]")
-        ax.set_xlabel("asset [$]")
+        if with_expectation:
+            ax2 = ax.twinx()
+            self.plot_expectation(figax=(fig, ax2))
         if show_legend:
             fig.legend()
         fig.tight_layout()
         return fig, ax
 
-    def plot_market(self, figax: Optional[tuple] = None, show_legend=True):
-        fig, ax = plt.subplots() if figax is None else figax
-        self.plot_deviations(figax=(fig, ax))
-        ax2 = ax.twinx()
-        self.plot_expectation(figax=(fig, ax2))
-        if show_legend:
-            fig.legend()
-        fig.tight_layout()
+    def plot_market(self, figax: Optional[tuple] = None, show_legend: bool = True, with_expectation: bool = True):
+        return self._plot_raw_and_smooth(
+            self.market[1:],
+            "contract [$]",
+            smooth_matrix=self.smoothed,
+            figax=figax,
+            show_legend=show_legend,
+            with_expectation=with_expectation
+        )
+
+    def plot_premium(self, figax: Optional[tuple] = None, show_legend: bool = True,  with_expectation: bool = True):
+        return self._plot_raw_and_smooth(
+            self.premiums,
+            "contract premium [$]",
+            smooth_matrix=self.smoothed_premiums,
+            figax=figax,
+            show_legend=show_legend,
+            with_expectation=with_expectation
+        )
+
+    def plot_deviations(self, figax: Optional[tuple] = None, show_legend: bool = True, with_expectation: bool = True):
+        fig, ax = self._plot_raw_and_smooth(
+            self.normalized_deviations * 100,
+            "contract deviation [%]",
+            figax=figax,
+            show_legend=show_legend,
+            with_expectation=with_expectation
+        )
+        ax.axhline(0, color='k')
         return fig, ax
