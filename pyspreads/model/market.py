@@ -153,7 +153,7 @@ class HasMarket(HasAsset):
 
     def plot_market(self, figax: Optional[tuple] = None, show_legend=True):
         fig, ax = plt.subplots() if figax is None else figax
-        self.plot_matrix(figax=(fig, ax))
+        self.plot_deviations(figax=(fig, ax))
         ax2 = ax.twinx()
         self.plot_expectation(figax=(fig, ax2))
         if show_legend:
