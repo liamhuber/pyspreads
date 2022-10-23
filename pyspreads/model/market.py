@@ -130,7 +130,7 @@ class HasMarket(HasAsset):
         for label, raw, smooth in zip(
                 ['call bid', 'call ask', 'put bid', 'put ask'],
                 raw_matrix,
-                smooth_matrix or raw_matrix
+                smooth_matrix if smooth_matrix is not None else raw_matrix
         ):
             ax.scatter(self.asset_prices, raw, color=self.colors[label])
             if smooth_matrix is not None:

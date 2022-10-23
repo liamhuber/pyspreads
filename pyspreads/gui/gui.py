@@ -3,44 +3,21 @@ from IPython.display import display
 
 from pyspreads.gui.data import Loader
 from pyspreads.gui.market import MarketGUI
-from pyspreads.model import VerticalModel
+from pyspreads.gui.positions import PositionsGUI
 
 
-class VerticalGUI(VerticalModel, MarketGUI):
+class VerticalGUI(MarketGUI, PositionsGUI):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.asset_print = widgets.Label(f"Asset price = {self.asset}")
-        self.market_gui = MarketGUI()
-        self.market_display = widgets.Output()
-        self.deviations_display = widgets.Output()
-        self.portfolio_display = widgets.Output()
-        clear_portfolio_button = widgets.Button(description="Clear portfolio")
-        clear_portfolio_button.on_click(self.on_click_clear_portfolio)
-        self.portfolio_summary = widgets.VBox(
-            [
-                widgets.Label("Per-contract values:"),
-                widgets.Label(f"Max return (if bounded) = NaN"),
-                widgets.Label(f"'Expected' return = NaN"),
-                widgets.Label(f"Max drawdown (if bounded) =NaN"),
-                clear_portfolio_button
-            ]
-        )
+        self.trade_widget = self._build_trade_widget()
+
+        self.clear_positions_button.on_click(self.on_click_clear_positions)
+
         self.trade_screen = widgets.HBox(
             [
-                self.market_gui.widget,
-                widgets.VBox(
-                    [
-                        self.portfolio_display,
-                        self.portfolio_summary
-                    ]
-                ),
-                widgets.VBox(
-                    [
-                        self.market_display,
-                        self.deviations_display,
-                        self.asset_print
-                    ]
-                )
+                self.trade_widget,
+                self.positions_widget,
+                self.market_widget
             ]
         )
         self.loader = Loader(self)
@@ -48,82 +25,105 @@ class VerticalGUI(VerticalModel, MarketGUI):
         self.tabs = widgets.Tab(
             [
                 self.trade_screen,
-                widgets.VBox(
-                    [
-                        widgets.HBox([self.market_display, self.deviations_display]),
-                        self.asset_print
-                    ]
-                ),
-                widgets.HBox([self.portfolio_display, self.portfolio_summary]),
-                self.loader.widget
+                self.market_screen,
+                self.positions_screen,
+                self.loader.screen
             ],
             layout=widgets.Layout(height='550px')
         )
         self.tabs.set_title(0, 'Trade')
         self.tabs.set_title(1, 'Market')
-        self.tabs.set_title(2, 'Portfolio')
+        self.tabs.set_title(2, 'Positions')
         self.tabs.set_title(3, 'Load data')
 
-    def draw_market_plot(self):
-        self.market_display.clear_output()
-        with self.market_display:
-            display(self.plot_market()[0])
+    def _build_trade_widget(self):
+        row_layout = widgets.Layout(min_height='35px')
+        header = widgets.HBox(
+            [self.make_label(text) for text in ["Call Bid", "Call Ask", "Strike", "Put Bid", "Put Ask"]],
+            layout=row_layout
+        )
 
-    def draw_deviations_plot(self):
-        self.deviations_display.clear_output()
-        with self.deviations_display:
-            display(self.plot_deviations()[0])
+        rows = []
+        for row in self.market.T:
+            rows.append(widgets.HBox(
+                [
+                    self.make_option_button(row[1], row[0], 'short', 'call'),
+                    self.make_option_button(row[2], row[0], 'long', 'call'),
+                    self.make_label(self.price_to_string(row[0])),
+                    self.make_option_button(row[3], row[0], 'short', 'put'),
+                    self.make_option_button(row[4], row[0], 'long', 'put'),
+                ],
+                layout=row_layout
+            ))
+        button_panel = widgets.VBox(rows)
 
-    def draw_portfolio_plot(self):
-        self.portfolio_display.clear_output()
-        with self.portfolio_display:
-            display(self.plot_positions()[0])
+        return widgets.VBox(
+            [header, button_panel],
+            layout=widgets.Layout(height='450px', min_width='320px')
+        )
 
-    def update_portfolio_summary(self):
-        self.portfolio_summary.children[1].value = f"Max return (if bounded) = {self.max_return:.3f}"
-        self.portfolio_summary.children[2].value = f"'Expected' return = {self.expectation:.3f}"
-        self.portfolio_summary.children[3].value = f"Max drawdown (if bounded) = {self.max_drawdown:.3f}"
+    def make_label(self, text):
+        return widgets.Label(text, layout=self.button_layout)
 
-    def update_market_gui(self):
-        """Careful, this one is expensive"""
-        self.market_gui = MarketGUI()
-        self.market_gui.draw()
+    def make_option_button(self, price: float, strike: float, long_or_short: str, call_or_put: str):
+        button = widgets.ToggleButton(
+            description=self.price_to_string(price),
+            layout=self.button_layout
+        )
+        button.price = price
+        button.strike = strike
+        button.long_or_short = long_or_short
+        button.call_or_put = call_or_put
+        if self.position_name(strike, long_or_short, call_or_put) in self.positions.keys():
+            button.value = True
+        button.observe(self._on_option_button_toggle, names=['value'])
+        if (strike < self.asset and call_or_put == 'call') or (self.asset < strike and call_or_put == 'put'):
+            button.style.text_color = 'darkgreen'
+        return button
 
-    def update_market(self):
-        self.update_market_gui()
-        self.draw_market_plot()
-        self.draw_deviations_plot()
-        self.asset_print = widgets.Label(f"ASSET PRICE = {self.asset}")
+    @staticmethod
+    def price_to_string(price):
+        return f"{price:2.2f}"
 
-    def update_portfolio(self):
-        self.draw_portfolio_plot()
-        self.update_portfolio_summary()
+    def _on_option_button_toggle(self, change):
+        button = change['owner']
+        if change['new']:  # Pressed
+            self.take_position(button.price, button.strike, button.long_or_short, button.call_or_put)
+        else:  # Unpressed
+            try:
+                self.remove_position(button.strike, button.long_or_short, button.call_or_put)
+            except KeyError:
+                pass
+                # TODO: This is an ugly hack to do with unpressing a button after the portfolio has been cleared.
+                #       Find a  nicer way to deal with it.
 
-    def update(self):
-        self.update_market()
-        self.update_portfolio()
-
-    def draw(self):
-        self.update()
-        return self.tabs
-
-    def take_position(self, price: float, strike: float, long_or_short: str, call_or_put: str):
-        super().take_position(price=price, strike=strike, long_or_short=long_or_short, call_or_put=call_or_put)
-        self.update_portfolio()
-
-    def remove_position(self, strike: float, long_or_short: str, call_or_put: str):
-        super().remove_position(strike=strike, long_or_short=long_or_short, call_or_put=call_or_put)
-        self.update_portfolio()
+    def unpress_all_trade_buttons(self):
+        """
+        TODO: Be more elegant and store the pressed ones somewhere to avoid the loop
+        """
+        for hbox in self.trade_widget.children[1].children:
+            for button in hbox.children:
+                if isinstance(button, widgets.ToggleButton) and button.value:
+                    button.value = False
 
     def clear_positions(self):
         super().clear_positions()
-        self.update_portfolio()
-        # self.market_gui.unpress_all()
+        # self.unpress_all_trade_buttons()
         for hbox in self.tabs.children[0].children[0].children[1].children:
             for tb in hbox.children:
                 if isinstance(tb, widgets.ToggleButton) and tb.value == True:
                     tb.value = False
         # TODO: Figure out why the buttons list in the market_gui is not the same as these children
 
-    def on_click_clear_portfolio(self, change):
+    def on_click_clear_positions(self, change):
         self.clear_positions()
+
+    def update(self):
+        self.update_market()
+        self.update_positions()
+        self.trade_widget = self._build_trade_widget()
+        self.asset_label.value = f"ASSET PRICE = {self.asset}"
+
+    def draw(self):
+        self.update()
+        return self.tabs

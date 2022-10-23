@@ -1,17 +1,20 @@
-from abc import ABC, abstractmethod
+from abc import ABC
+
+import ipywidgets as widgets
+from IPython.display import display
+
+from pyspreads.model.base import HasAsset
 
 
-class SubWidget(ABC):
-    def __init__(self, gui):
-        self.gui = gui
-        self._widget = None
+class GUIBase(HasAsset, ABC):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.button_layout = widgets.Layout(width='60px', justify_content='center')
+        self.asset_label = widgets.Label(f"Asset price = {self.asset}")
 
-    @property
-    def widget(self):
-        if self._widget is None:
-            self._widget = self.draw()
-        return self._widget
+    @staticmethod
+    def _output_plot(output, plot):
+        output.clear_output()
+        with output:
+            display(plot)
 
-    @abstractmethod
-    def draw(self):
-        pass

@@ -5,15 +5,14 @@ from typing import TYPE_CHECKING
 import ipywidgets as widgets
 
 from pyspreads.data.parser import read
-from pyspreads.gui.base import SubWidget
 
 if TYPE_CHECKING:
     from pyspreads.gui.gui import VerticalGUI
 
 
-class Loader(SubWidget):
+class Loader:
     def __init__(self, gui: VerticalGUI):
-        super().__init__(gui=gui)
+        self.gui = gui
         control_layout = widgets.Layout(width='190px')
         style = {'description_width': '110px'}
         self.asset = widgets.FloatText(description="Asset price", style=style, layout=control_layout)
@@ -50,9 +49,7 @@ class Loader(SubWidget):
             placeholder="Enter columnar market data here",
             layout=widgets.Layout(height='400px', width='100%')
         )
-
-    def draw(self):
-        return widgets.HBox([self.controls, self.data])
+        self.screen = widgets.HBox([self.controls, self.data])
 
     def _on_load(self, change):
         asset = self.asset.value

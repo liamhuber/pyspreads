@@ -1,89 +1,91 @@
-from __future__ import annotations
-
-from typing import TYPE_CHECKING
-
 import ipywidgets as widgets
 
+from pyspreads.gui.base import GUIBase
 from pyspreads.model.market import HasMarket
 
-if TYPE_CHECKING:
-    from pyspreads.gui.gui import VerticalGUI
 
-
-class MarketGUI(HasMarket):
-    def __init__(self, gui: VerticalGUI):
-        super().__init__(gui=gui)
-        self.button_layout = widgets.Layout(width='60px', justify_content='center')
-        self.row_layout = widgets.Layout(min_height='35px')
-        self.buttons = []
-
+class MarketGUI(HasMarket, GUIBase):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.market_output = widgets.Output()
-        self.
+        self.premium_output = widgets.Output()
+        self.deviation_output = widgets.Output()
 
-    @staticmethod
-    def price_to_string(price):
-        return f"{price:2.2f}"
-
-    def label(self, text):
-        return widgets.Label(text, layout=self.button_layout)
-
-    def option_button(self, price: float, strike: float, long_or_short: str, call_or_put: str):
-        button = widgets.ToggleButton(
-            description=self.price_to_string(price),
-            layout=self.button_layout
+        control_layout = widgets.Layout(width='190px')
+        style = {'description_width': '110px'}
+        self.smoothing_window_widget = widgets.BoundedIntText(
+            description="Savgol smoothing window",
+            value=self.smoothing_window,
+            min=3,
+            max=len(self.asset_prices),
+            style=style,
+            layout=control_layout
         )
-        button.price = price
-        button.strike = strike
-        button.long_or_short = long_or_short
-        button.call_or_put = call_or_put
-        if self.gui.position_name(strike, long_or_short, call_or_put) in self.gui.positions.keys():
-            button.value = True
-        button.observe(self._on_option_button_toggle, names=['value'])
-        if (strike < self.gui.asset and call_or_put == 'call') or (self.gui.asset < strike and call_or_put == 'put'):
-            button.style.text_color = 'darkgreen'
-        return button
-
-    def _on_option_button_toggle(self, change):
-        button = change['owner']
-        if change['new']:  # Pressed
-            self.gui.take_position(button.price, button.strike, button.long_or_short, button.call_or_put)
-        else:  # Unpressed
-            try:
-                self.gui.remove_position(button.strike, button.long_or_short, button.call_or_put)
-            except KeyError:
-                pass
-                # TODO: This is an ugly hack to do with unpressing a button after the portfolio has been cleared.
-                #       Find a  nicer way to deal with it.
-
-    def draw(self):
-        header = widgets.HBox(
-            [self.label(text) for text in ["Call Bid", "Call Ask", "Strike", "Put Bid", "Put Ask"]],
-            layout=self.row_layout
+        self.smoothing_order_widget = widgets.BoundedIntText(
+            description="Savgol smoothing order",
+            value=self.smoothing_order,
+            min=2,
+            max=len(self.asset_prices) - 1,
+            style=style,
+            layout=control_layout
         )
 
-        rows = []
-        for row in self.gui.market.T:
-            rows.append(widgets.HBox(
-                [
-                    self.option_button(row[1], row[0], 'short', 'call'),
-                    self.option_button(row[2], row[0], 'long', 'call'),
-                    self.label(self.price_to_string(row[0])),
-                    self.option_button(row[3], row[0], 'short', 'put'),
-                    self.option_button(row[4], row[0], 'long', 'put'),
-                ],
-                layout=self.row_layout
-            ))
+        self.smoothing_window_widget.observe(self._update_savgol_window, 'value')
+        self.smoothing_order_widget.observe(self._update_savgol_order, 'value')
 
-        # panel_layout =
-        panel = widgets.VBox(rows) #, layout=panel_layout)
+    def _update_savgol_window(self, change):
+        self.smoothing_window = change['new']
+        self.update_market()
 
-        return widgets.VBox([header, panel], layout=widgets.Layout(height='450px', min_width='320px'))
+    def _update_savgol_order(self, change):
+        self.smoothing_order = change['new']
+        self.update_market()
 
-    def unpress_all(self):
-        """
-        TODO: Be more elegant and store the pressed ones somewhere to avoid the loop
-        """
-        for hbox in self.widget.children[1].children:
-            for button in hbox.children:
-                if isinstance(button, widgets.ToggleButton) and button.value:
-                    button.value = False
+    def draw_market_plot(self):
+        self._output_plot(self.market_output, self.plot_market()[0])
+
+    def draw_premium_plot(self):
+        self._output_plot(self.premium_output, self.plot_premium()[0])
+
+    def draw_deviations_plot(self):
+        self._output_plot(self.deviation_output, self.plot_deviations()[0])
+
+    def update_market(self):
+        self.draw_market_plot()
+        self.draw_premium_plot()
+        self.draw_deviations_plot()
+        self.smoothing_window_widget.max = len(self.asset_prices)
+        self.smoothing_order_widget.max = len(self.asset_prices) - 1
+
+    @property
+    def market_screen(self):
+        return widgets.VBox(
+            [
+                widgets.HBox(
+                    [
+                        self.asset_label,
+                        self.smoothing_window_widget,
+                        self.smoothing_order_widget
+                    ]
+                ),
+                widgets.VBox(
+                    [
+                        self.market_output,
+                        self.premium_output,
+                        self.deviation_output
+                    ]
+                )
+            ]
+        )
+
+    @property
+    def market_widget(self):
+        return widgets.VBox(
+                    [
+                        self.premium_output,
+                        self.deviation_output,
+                        self.asset_label
+                    ]
+                )
+
+

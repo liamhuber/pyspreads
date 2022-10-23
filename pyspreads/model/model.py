@@ -9,12 +9,13 @@ from pyspreads.model.positions import HasPositions
 
 
 class VerticalModel(HasMarket, HasPositions):
-    def plot_positions(self, figax: Optional[tuple] = None, show_legend=True):
+    def plot_positions(self, figax: Optional[tuple] = None, show_legend=True, with_expectation: bool = True):
         fig, ax = plt.subplots() if figax is None else figax
         if len(self.positions) > 0:
             super().plot_positions(self.asset_prices, figax=(fig, ax))
-        ax2 = ax.twinx()
-        self.plot_expectation(figax=(fig, ax2))
+        if with_expectation:
+            ax2 = ax.twinx()
+            self.plot_expectation(figax=(fig, ax2))
         if show_legend:
             fig.legend()
         fig.tight_layout()
