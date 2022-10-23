@@ -1,11 +1,12 @@
 import ipywidgets as widgets
 
 
+# Styling https://github.com/jupyter-widgets/ipywidgets/issues/1333
 class About:
     def __init__(self):
         content = """
         Some placeholder until I have the readme written and can steal from there.
-            
+        </br>
         Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et 
         dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex 
         ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu 
