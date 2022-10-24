@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 from scipy.signal import savgol_filter
-from traitlets import default, Dict, Instance, Int
+from traitlets import default, Dict, Instance, Int, TraitError, validate
 
 from pyspreads.model.base import HasAsset
 from pyspreads.data.parser import read
@@ -19,6 +19,12 @@ class HasMarket(HasAsset):
     smoothing_window = Int(default_value=7, help="Window size for Savitzky-Golay smoothing")
     smoothing_order = Int(default_value=3, help="Polynomial order for Savitzky-Golay smoothing")
     colors = Dict()
+
+    @validate('smoothing_window')
+    def _odds_only(self, proposal):
+        if proposal['value'] % 2 != 1:
+            raise TraitError(f"Smoothing window must be odd but got {proposal['value']}") from None
+        return proposal['value']
 
     @default('market')
     def _read_placeholder_data(self):

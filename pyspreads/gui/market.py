@@ -16,6 +16,7 @@ class MarketGUI(HasMarket, GUIBase):
         self.smoothing_window_widget = widgets.BoundedIntText(
             description="Savgol smoothing window",
             value=self.smoothing_window,
+            step=2,
             min=3,
             max=len(self.asset_prices),
             style=style,
