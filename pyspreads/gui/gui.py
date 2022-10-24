@@ -71,9 +71,14 @@ class VerticalGUI(MarketGUI, PositionsGUI):
         return widgets.Label(text, layout=self.button_layout)
 
     def make_option_button(self, price: float, strike: float, long_or_short: str, call_or_put: str):
+        if (strike < self.asset and call_or_put == 'call') or (self.asset < strike and call_or_put == 'put'):
+            style_kwarg = {'button_style': 'success'}
+        else:
+            style_kwarg = {}
         button = widgets.ToggleButton(
             description=self.price_to_string(price),
-            layout=self.button_layout
+            layout=self.button_layout,
+            **style_kwarg
         )
         button.price = price
         button.strike = strike
@@ -82,8 +87,6 @@ class VerticalGUI(MarketGUI, PositionsGUI):
         if self.position_name(strike, long_or_short, call_or_put) in self.positions.keys():
             button.value = True
         button.observe(self._on_option_button_toggle, names=['value'])
-        if (strike < self.asset and call_or_put == 'call') or (self.asset < strike and call_or_put == 'put'):
-            button.style.text_color = 'darkgreen'
         return button
 
     @staticmethod
