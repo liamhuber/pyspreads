@@ -42,3 +42,11 @@ class PositionsGUI(VerticalModel, GUIBase):
     @property
     def positions_widget(self):
         return widgets.VBox([self.positions_output, self.positions_summary])
+
+    def take_position(self, price: float, strike: float, long_or_short: str, call_or_put: str):
+        super().take_position(price=price, strike=strike, long_or_short=long_or_short, call_or_put=call_or_put)
+        self.update_positions()
+
+    def remove_position(self, strike: float, long_or_short: str, call_or_put: str):
+        super().remove_position(strike=strike, long_or_short=long_or_short, call_or_put=call_or_put)
+        self.update_positions()
