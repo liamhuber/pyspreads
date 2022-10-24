@@ -68,6 +68,10 @@ class Option(HasTraits):
     def _is_short(self):
         return not self._is_long
 
+    @property
+    def in_the_money(self):
+        return (self._is_call and self.asset > self.strike) or (self._is_put and self.asset < self.strike)
+
     def value(self, asset_prices):
         # TODO: Refactor into a single statement with bool-based multipliers if this winds up looking right
         if self._is_short and self._is_call:
