@@ -128,6 +128,13 @@ class VerticalGUI(MarketGUI, PositionsGUI):
 
     def update_trade(self, change=None):
         self.trade_widget = self._build_trade_widget()
+        self.trade_screen = widgets.HBox(
+            [
+                self.trade_widget,
+                self.positions_widget,
+                self.market_widget
+            ]
+        )
 
     def update_all(self):
         self.update_market()
