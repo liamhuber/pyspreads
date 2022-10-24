@@ -39,6 +39,7 @@ class VerticalGUI(MarketGUI, PositionsGUI):
         self.tabs.set_title(4, 'About')
 
         self.observe(self.update_trade, names=['market', 'asset'])
+        self.update_all()
 
     def _build_trade_widget(self):
         row_layout = widgets.Layout(min_height='35px')
@@ -130,6 +131,5 @@ class VerticalGUI(MarketGUI, PositionsGUI):
         self.update_positions()
         self.update_trade()
 
-    def draw(self):
-        self.update_all()
+    def show(self):
         return self.tabs
