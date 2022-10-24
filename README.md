@@ -1,6 +1,6 @@
 # pyspreads
 
-[![Voila](https://github.com/voila-dashboards/voila/raw/main/docs/source/voila-logo.svg)](https://mybinder.org/v2/gh/liamhuber/pyspreads/HEAD?urlpath=voila%2Frender%2Fapp.ipynb)
+[![voila](.launch-voila.svg)](https://mybinder.org/v2/gh/liamhuber/pyspreads/HEAD?urlpath=voila%2Frender%2Fapp.ipynb)
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/liamhuber/pyspreads/HEAD?labpath=app.ipynb)
 [![License](https://img.shields.io/badge/License-BSD_3--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
 
