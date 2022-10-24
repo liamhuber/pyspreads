@@ -41,7 +41,7 @@ class VerticalGUI(MarketGUI, PositionsGUI):
         self.observe(self.update_trade, names=['market', 'asset'])
         self.update_all()
 
-    def _build_trade_widget(self):
+    def _build_trade_children(self):
         row_layout = widgets.Layout(min_height='35px')
         header = widgets.HBox(
             [self.make_label(text) for text in ["Call Bid", "Call Ask", "Strike", "Put Bid", "Put Ask"]],
@@ -61,7 +61,10 @@ class VerticalGUI(MarketGUI, PositionsGUI):
                 layout=row_layout
             ))
         button_panel = widgets.VBox(rows)
+        return header, button_panel
 
+    def _build_trade_widget(self):
+        header, button_panel = self._build_trade_children()
         return widgets.VBox(
             [header, button_panel],
             layout=widgets.Layout(height='450px', min_width='320px')
@@ -127,14 +130,8 @@ class VerticalGUI(MarketGUI, PositionsGUI):
         self.clear_positions()
 
     def update_trade(self, change=None):
-        self.trade_widget = self._build_trade_widget()
-        self.trade_screen = widgets.HBox(
-            [
-                self.trade_widget,
-                self.positions_widget,
-                self.market_widget
-            ]
-        )
+        self.trade_widget.children = self._build_trade_children()
+
 
     def update_all(self):
         self.update_market()
