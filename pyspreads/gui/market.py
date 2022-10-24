@@ -32,14 +32,13 @@ class MarketGUI(HasMarket, GUIBase):
 
         self.smoothing_window_widget.observe(self._update_savgol_window, 'value')
         self.smoothing_order_widget.observe(self._update_savgol_order, 'value')
+        self.observe(self.update_market, names=['market', 'smoothing_window', 'smoothing_order'])
 
     def _update_savgol_window(self, change):
         self.smoothing_window = change['new']
-        self.update_market()
 
     def _update_savgol_order(self, change):
         self.smoothing_order = change['new']
-        self.update_market()
 
     def draw_market_plot(self):
         self._output_plot(self.market_output, self.plot_market()[0])
@@ -50,7 +49,7 @@ class MarketGUI(HasMarket, GUIBase):
     def draw_deviations_plot(self):
         self._output_plot(self.deviation_output, self.plot_deviations()[0])
 
-    def update_market(self):
+    def update_market(self, change=None):
         self.draw_market_plot()
         self.draw_premium_plot()
         self.draw_deviations_plot()

@@ -11,6 +11,10 @@ class GUIBase(HasAsset, ABC):
         super().__init__(*args, **kwargs)
         self.button_layout = widgets.Layout(width='60px', justify_content='center')
         self.asset_label = widgets.Label(f"Asset price = {self.asset}")
+        self.observe(self._update_asset_label, names=['asset'])
+
+    def _update_asset_label(self, change):
+        self.asset_label.value = f"Asset price = {change['new']}"
 
     @staticmethod
     def _output_plot(output, plot):

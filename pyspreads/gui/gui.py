@@ -38,6 +38,8 @@ class VerticalGUI(MarketGUI, PositionsGUI):
         self.tabs.set_title(3, 'Load data')
         self.tabs.set_title(4, 'About')
 
+        self.observe(self.update_trade, names=['market', 'asset'])
+
     def _build_trade_widget(self):
         row_layout = widgets.Layout(min_height='35px')
         header = widgets.HBox(
@@ -120,12 +122,14 @@ class VerticalGUI(MarketGUI, PositionsGUI):
     def on_click_clear_positions(self, change):
         self.clear_positions()
 
-    def update(self):
+    def update_trade(self, change=None):
+        self.trade_widget = self._build_trade_widget()
+
+    def update_all(self):
         self.update_market()
         self.update_positions()
-        self.trade_widget = self._build_trade_widget()
-        self.asset_label.value = f"ASSET PRICE = {self.asset}"
+        self.update_trade()
 
     def draw(self):
-        self.update()
+        self.update_all()
         return self.tabs

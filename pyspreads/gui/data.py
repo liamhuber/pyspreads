@@ -66,6 +66,6 @@ class Loader:
             comments=self.comments.value,
             skiprows=self.skiprows.value
         )
-        self.gui.asset = asset
-        self.gui.market = market
-        self.gui.update()
+        with self.gui.hold_trait_notifications():
+            self.gui.asset = asset
+            self.gui.market = market
