@@ -132,7 +132,6 @@ class VerticalGUI(MarketGUI, PositionsGUI):
     def update_trade(self, change=None):
         self.trade_widget.children = self._build_trade_children()
 
-
     def update_all(self):
         self.update_market()
         self.update_positions()
