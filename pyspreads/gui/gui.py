@@ -39,6 +39,7 @@ class VerticalGUI(MarketGUI, PositionsGUI):
         self.tabs.set_title(4, 'About')
 
         self.observe(self.update_trade, names=['market', 'asset'])
+        self.observe(self.reset_positions, names=['market', 'asset'])
         self.update_all()
 
     def _build_trade_children(self):
@@ -131,7 +132,6 @@ class VerticalGUI(MarketGUI, PositionsGUI):
 
     def update_trade(self, change=None):
         self.trade_widget.children = self._build_trade_children()
-
 
     def update_all(self):
         self.update_market()
