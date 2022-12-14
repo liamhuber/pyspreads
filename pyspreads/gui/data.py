@@ -50,9 +50,11 @@ class Loader:
                         "needed",
             layout=widgets.Layout(height='400px', width='100%')
         )
+        self._loading_screen = widgets.Label("Loading...")
         self.screen = widgets.HBox([self.controls, self.data])
 
     def _on_load(self, change):
+        self.gui.tabs_to_loading()
         asset = self.asset.value
         market = read(
             self.data.value,
@@ -67,7 +69,7 @@ class Loader:
             skiprows=self.skiprows.value
         )
         self.data.value = ''
-        self.gui.tabs.selected_index = 0
         with self.gui.hold_trait_notifications():
             self.gui.asset = asset
             self.gui.market = market
+        self.gui.tabs_to_app()
