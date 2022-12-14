@@ -35,6 +35,10 @@ class PositionsGUI(VerticalModel, GUIBase):
         self._update_positions_summary()
         self.draw_positions_plot()
 
+    def reset_positions(self, change=None):
+        self.clear_positions()
+        self.update_positions(change=change)
+
     @property
     def positions_screen(self):
         return widgets.HBox([self.positions_output, self.positions_summary])
