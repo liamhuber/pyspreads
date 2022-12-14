@@ -22,21 +22,20 @@ class VerticalGUI(MarketGUI, PositionsGUI):
         )
         self.loader = Loader(self)
 
-        self.tabs = widgets.Tab(
-            [
-                self.trade_screen,
-                self.market_screen,
-                self.positions_screen,
-                self.loader.screen,
-                About().screen
-            ],
-            layout=widgets.Layout(height='550px')
-        )
-        self.tabs.set_title(0, 'Trade')
-        self.tabs.set_title(1, 'Market')
-        self.tabs.set_title(2, 'Positions')
-        self.tabs.set_title(3, 'Load data')
-        self.tabs.set_title(4, 'About')
+        self._app_tabs = [
+            self.trade_screen,
+            self.market_screen,
+            self.positions_screen,
+            self.loader.screen,
+            About().screen
+        ]
+        self._app_tab_labels = ['Trade', 'Market', 'Positions', 'Load data', 'About']
+        self._loading_tabs = [
+            widgets.Label("Loading...")
+        ]
+        self._loading_tab_labels = ['Please wait']
+        self.tabs = widgets.Tab([], layout=widgets.Layout(height='550px'))
+        self.tabs_to_app()
 
         self.observe(self.update_trade, names=['market', 'asset'])
         self.observe(self.reset_positions, names=['market', 'asset'])
@@ -121,11 +120,23 @@ class VerticalGUI(MarketGUI, PositionsGUI):
     def clear_positions(self):
         super().clear_positions()
         # self.unpress_all_trade_buttons()
-        for hbox in self.tabs.children[0].children[0].children[1].children:
+        for hbox in self._app_tabs[0].children[0].children[1].children:
             for tb in hbox.children:
                 if isinstance(tb, widgets.ToggleButton) and tb.value == True:
                     tb.value = False
         # TODO: Figure out why the buttons list in the market_gui is not the same as these children
+
+    def _set_tabs(self, tabs, labels, selected_index=0):
+        self.tabs.children = tabs
+        self.tabs.selected_index = selected_index
+        for i, label in enumerate(labels):
+            self.tabs.set_title(i, label)
+
+    def tabs_to_loading(self):
+        self._set_tabs(self._loading_tabs, self._loading_tab_labels)
+
+    def tabs_to_app(self):
+        self._set_tabs(self._app_tabs, self._app_tab_labels)
 
     def on_click_clear_positions(self, change):
         self.clear_positions()
